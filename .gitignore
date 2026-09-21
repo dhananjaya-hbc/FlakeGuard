@@ -2,3 +2,4 @@
 /server
 *.exe
 .env
+.mcp.json
