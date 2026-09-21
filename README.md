@@ -97,6 +97,8 @@ claude mcp add --transport stdio flakeguard --scope project \
 
 Restart Claude Code (or run `/mcp` to check connection status) and the three tools below become available to the assistant automatically — no further setup needed on the assistant side.
 
+Note: `.mcp.json` with an absolute path and inline credentials is machine-specific — it's `.gitignore`d in this repo rather than committed. If your whole team should share one config, use a relative path (`./flakeguard`) and reference a host env var instead of hardcoding the connection string (Claude Code expands `${DATABASE_URL}` inside `.mcp.json`).
+
 ## Worked example
 
 Say `TestFoo` in `myorg/myrepo` just failed in CI. A developer asks Claude Code "did I break something, or is this test just flaky?" Claude Code calls `check_test_flakiness`:
