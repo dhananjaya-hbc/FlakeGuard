@@ -242,16 +242,39 @@ Inside GitHub Actions, `--repo`/`--branch`/`--commit-sha`/`--ci-run-id` are auto
 ## Project structure
 
 ```
-cmd/server/main.go          # entrypoint — "http" or "mcp" mode, chosen by arg
-internal/
-  mcp/                      # protocol types, tool definitions, stdio transport loop
-  ingest/                   # HTTP handler + API key auth for /ingest
-  repository/               # all Postgres queries — nothing else writes SQL
-migrations/001_init.sql     # schema: test_runs (raw history), test_flakiness (computed scores)
-scripts/convert_go_test_json.py
-.github/workflows/example-usage.yml
-Dockerfile                  # multi-stage build
-docker-compose.yml          # Postgres + API for local dev
+FlakeGuard/
+├── cmd/
+│   └── server/
+│       └── main.go                  # entrypoint — "http" or "mcp" mode, chosen by arg
+├── internal/
+│   ├── mcp/                         # protocol types, tool definitions, stdio transport loop
+│   │   ├── protocol.go              # JSON-RPC 2.0 + MCP message types
+│   │   ├── server.go                # stdio transport loop (initialize/tools/list/tools/call)
+│   │   ├── register.go              # wires the three tools into a Server
+│   │   ├── tool_check_flakiness.go
+│   │   ├── tool_history.go
+│   │   └── tool_list_flakiest.go
+│   ├── ingest/                      # HTTP handler + API key auth for /ingest
+│   │   ├── handler.go
+│   │   ├── auth.go
+│   │   └── models.go
+│   └── repository/                  # all Postgres queries — nothing else writes SQL
+│       ├── repository.go            # Repository struct + pgxpool constructor
+│       ├── models.go
+│       ├── record.go                # RecordRun, RecordRuns
+│       ├── history.go               # History
+│       └── flakiness.go             # Flakiness, FlakiestTests, RefreshFlakinessScores
+├── migrations/
+│   └── 001_init.sql                 # schema: test_runs (raw history), test_flakiness (computed scores)
+├── scripts/
+│   └── convert_go_test_json.py
+├── .github/
+│   └── workflows/
+│       └── example-usage.yml
+├── Dockerfile                       # multi-stage build
+├── docker-compose.yml                # Postgres + API for local dev
+├── go.mod
+└── go.sum
 ```
 
 Two files intentionally aren't committed, since they're machine-specific: `.env` (your local secrets — copy `.env.example` to start) and `.mcp.json` (your local Claude Code MCP registration).
