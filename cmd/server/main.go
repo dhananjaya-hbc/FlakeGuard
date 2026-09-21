@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/dhananjaya/flakeguard/internal/ingest"
 	"github.com/dhananjaya/flakeguard/internal/mcp"
@@ -34,7 +35,7 @@ func main() {
 	case "mcp":
 		runMCP(ctx, repo)
 	case "http":
-		runHTTP(repo)
+		runHTTP(ctx, repo)
 	default:
 		fmt.Fprintf(os.Stderr, "unknown mode %q: expected \"http\" or \"mcp\"\n", os.Args[1])
 		os.Exit(1)
@@ -50,9 +51,11 @@ func runMCP(ctx context.Context, repo *repository.Repository) {
 	}
 }
 
-func runHTTP(repo *repository.Repository) {
+func runHTTP(ctx context.Context, repo *repository.Repository) {
 	mux := http.NewServeMux()
 	mux.Handle("/ingest", ingest.NewHandler(repo))
+
+	go refreshFlakinessLoop(ctx, repo)
 
 	addr := os.Getenv("HTTP_ADDR")
 	if addr == "" {
@@ -63,4 +66,38 @@ func runHTTP(repo *repository.Repository) {
 	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatalf("http server error: %v", err)
 	}
+}
+
+func refreshFlakinessLoop(ctx context.Context, repo *repository.Repository) {
+	interval := 2 * time.Minute
+	if v := os.Getenv("FLAKINESS_REFRESH_INTERVAL"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil {
+			interval = d
+		} else {
+			log.Printf("invalid FLAKINESS_REFRESH_INTERVAL %q, using default %s", v, interval)
+		}
+	}
+
+	refreshAllRepos(ctx, repo)
+
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		refreshAllRepos(ctx, repo)
+	}
+}
+
+func refreshAllRepos(ctx context.Context, repo *repository.Repository) {
+	repos, err := repo.DistinctRepos(ctx)
+	if err != nil {
+		log.Printf("listing repos for flakiness refresh: %v", err)
+		return
+	}
+	for _, r := range repos {
+		if err := repo.RefreshFlakinessScores(ctx, r); err != nil {
+			log.Printf("refreshing flakiness scores for %s: %v", r, err)
+		}
+	}
+	log.Printf("refreshed flakiness scores for %d repos", len(repos))
 }
