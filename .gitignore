@@ -1,0 +1,4 @@
+/flakeguard
+/server
+*.exe
+.env
