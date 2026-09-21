@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" role="img" aria-label="FlakeGuard architecture: a GitHub Actions runner converts go test JSON and POSTs it to the flakeguard http process, which writes through the repository layer into Postgres; a background ticker recomputes flakiness scores; separately an AI assistant spawns the flakeguard mcp process over stdio, which reads through the same repository layer.">
+  <style>
+    .bx   { fill: #F7F9FB; stroke: #C3CFDB; stroke-width: 1.2; }
+    .bx2  { fill: #E8EEF4; stroke: #C3CFDB; stroke-width: 1.2; }
+    .grp  { fill: none; stroke: #C3CFDB; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .db   { fill: #E6EFF8; stroke: #2A5A85; stroke-width: 1.3; }
+    .acc  { fill: #FAEEDC; stroke: #A65D0B; stroke-width: 1.3; }
+    .ln   { stroke: #6B8096; stroke-width: 1.4; fill: none; }
+    .lna  { stroke: #A65D0B; stroke-width: 1.6; fill: none; }
+    .t    { fill: #0F1A24; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 12.5px; }
+    .tb   { fill: #0F1A24; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 13px; font-weight: 600; }
+    .td   { fill: #475A6B; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 11.5px; }
+    .tm   { fill: #0F1A24; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    .tms  { fill: #0F1A24; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
+    .eyb  { fill: #6B8096; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; letter-spacing: 0.08em; }
+    .lbl  { fill: #6B8096; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; }
+    .eybd { fill: #2A5A85; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; letter-spacing: 0.08em; }
+    .sig  { fill: #A65D0B; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
+    .sigl { fill: #A65D0B; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; }
+    .ahd  { fill: #6B8096; }
+    .ahda { fill: #A65D0B; }
+  </style>
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="ahd"/>
+    </marker>
+    <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="ahda"/>
+    </marker>
+  </defs>
+
+  <!-- side labels -->
+  <text x="663" y="40" class="eyb" text-anchor="end">&#8592; WRITE SIDE</text>
+  <text x="683" y="40" class="eyb">READ SIDE &#8594;</text>
+  <line x1="673" y1="52" x2="673" y2="330" class="grp"/>
+
+  <!-- CI runner -->
+  <rect x="24" y="56" width="250" height="150" rx="7" class="grp"/>
+  <text x="38" y="78" class="eyb">GITHUB ACTIONS RUNNER</text>
+  <rect x="42" y="92" width="214" height="38" rx="5" class="bx"/>
+  <text x="56" y="116" class="tm">go test -json</text>
+  <rect x="42" y="142" width="214" height="46" rx="5" class="bx"/>
+  <text x="56" y="162" class="tms">convert_go_test</text>
+  <text x="56" y="178" class="tms">_json.py</text>
+
+  <!-- http process -->
+  <rect x="340" y="56" width="300" height="196" rx="7" class="grp"/>
+  <text x="354" y="78" class="eyb">PROCESS 1 &#183; flakeguard http</text>
+  <rect x="358" y="92" width="264" height="36" rx="5" class="bx2"/>
+  <text x="372" y="115" class="tm">RequireAPIKey</text>
+  <rect x="358" y="136" width="264" height="36" rx="5" class="bx"/>
+  <text x="372" y="159" class="tm">ingest.Handler</text>
+  <rect x="358" y="188" width="264" height="44" rx="5" class="acc"/>
+  <text x="372" y="206" class="tms">ticker goroutine</text>
+  <text x="372" y="222" class="lbl">every 2m &#183; configurable</text>
+
+  <!-- assistant -->
+  <rect x="706" y="56" width="264" height="48" rx="7" class="bx"/>
+  <text x="720" y="77" class="t">Claude Code / Cursor</text>
+  <text x="720" y="94" class="lbl">spawns the binary as a subprocess</text>
+
+  <!-- mcp process -->
+  <rect x="706" y="142" width="264" height="110" rx="7" class="grp"/>
+  <text x="720" y="164" class="eyb">PROCESS 2 &#183; flakeguard mcp</text>
+  <rect x="722" y="176" width="232" height="30" rx="5" class="bx"/>
+  <text x="734" y="196" class="tms">stdio JSON-RPC loop</text>
+  <rect x="722" y="212" width="232" height="30" rx="5" class="bx"/>
+  <text x="734" y="232" class="tms">3 tool handlers</text>
+
+  <!-- repository band -->
+  <rect x="24" y="360" width="946" height="60" rx="7" class="bx2"/>
+  <text x="44" y="384" class="tb">internal/repository</text>
+  <text x="44" y="404" class="td">the only package in the codebase that writes SQL</text>
+  <text x="952" y="396" class="lbl" text-anchor="end">pgxpool</text>
+
+  <!-- postgres -->
+  <rect x="24" y="464" width="946" height="104" rx="7" class="db"/>
+  <text x="44" y="490" class="eybd">POSTGRESQL</text>
+  <rect x="44" y="502" width="420" height="50" rx="5" class="bx"/>
+  <text x="60" y="522" class="tm">test_runs</text>
+  <text x="60" y="540" class="lbl">append-only &#183; one row per test execution</text>
+  <rect x="484" y="502" width="466" height="50" rx="5" class="bx"/>
+  <text x="500" y="522" class="tm">test_flakiness</text>
+  <text x="500" y="540" class="lbl">recomputed summary &#183; one row per (repo, test_name)</text>
+
+  <!-- CI -> http -->
+  <path d="M274,140 H332" class="ln" marker-end="url(#ar)"/>
+  <text x="303" y="128" class="lbl" text-anchor="middle">POST</text>
+  <text x="303" y="162" class="lbl" text-anchor="middle">+ key</text>
+
+  <!-- assistant <-> mcp -->
+  <path d="M838,104 V136" class="ln" marker-end="url(#ar)"/>
+  <text x="848" y="126" class="lbl">stdio</text>
+
+  <!-- http -> repository -->
+  <path d="M440,252 V352" class="ln" marker-end="url(#ar)"/>
+  <text x="450" y="290" class="tms">RecordRuns()</text>
+  <text x="450" y="306" class="lbl">one batch, one tx</text>
+
+  <!-- ticker -> repository -->
+  <path d="M580,252 V352" class="lna" marker-end="url(#ara)"/>
+  <text x="590" y="326" class="sig">RefreshFlakinessScores()</text>
+
+  <!-- mcp -> repository -->
+  <path d="M838,252 V352" class="ln" marker-end="url(#ar)"/>
+  <text x="848" y="290" class="tms">Flakiness()</text>
+  <text x="848" y="306" class="tms">History()</text>
+  <text x="848" y="322" class="tms">FlakiestTests()</text>
+
+  <!-- repository -> postgres -->
+  <path d="M240,420 V456" class="ln" marker-end="url(#ar)"/>
+  <text x="250" y="443" class="lbl">INSERT</text>
+  <path d="M580,420 V456" class="lna" marker-end="url(#ara)"/>
+  <text x="590" y="443" class="sigl">LAG() + UPSERT</text>
+  <path d="M838,456 V424" class="ln" marker-end="url(#ar)"/>
+  <text x="848" y="443" class="lbl">SELECT</text>
+</svg>
