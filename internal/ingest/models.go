@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dhananjaya/flakeguard/internal/repository"
+	"github.com/dhananjaya-hbc/FlakeGuard/internal/repository"
 )
 
 type Report struct {

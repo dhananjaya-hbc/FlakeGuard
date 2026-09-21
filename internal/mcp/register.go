@@ -1,7 +1,7 @@
 package mcp
 
 import (
-	"github.com/dhananjaya/flakeguard/internal/repository"
+	"github.com/dhananjaya-hbc/FlakeGuard/internal/repository"
 )
 
 func RegisterTools(server *Server, repo *repository.Repository) {

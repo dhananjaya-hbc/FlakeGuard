@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dhananjaya/flakeguard/internal/repository"
+	"github.com/dhananjaya-hbc/FlakeGuard/internal/repository"
 )
 
 func getTestHistoryTool() Tool {

@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dhananjaya/flakeguard/internal/repository"
+	"github.com/dhananjaya-hbc/FlakeGuard/internal/repository"
 )
 
 type Handler struct {

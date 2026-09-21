@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/dhananjaya/flakeguard/internal/ingest"
-	"github.com/dhananjaya/flakeguard/internal/mcp"
-	"github.com/dhananjaya/flakeguard/internal/repository"
+	"github.com/dhananjaya-hbc/FlakeGuard/internal/ingest"
+	"github.com/dhananjaya-hbc/FlakeGuard/internal/mcp"
+	"github.com/dhananjaya-hbc/FlakeGuard/internal/repository"
 )
 
 func main() {
