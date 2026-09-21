@@ -52,8 +52,13 @@ func runMCP(ctx context.Context, repo *repository.Repository) {
 }
 
 func runHTTP(ctx context.Context, repo *repository.Repository) {
+	apiKey := os.Getenv("INGEST_API_KEY")
+	if apiKey == "" {
+		log.Fatal("INGEST_API_KEY environment variable is required")
+	}
+
 	mux := http.NewServeMux()
-	mux.Handle("/ingest", ingest.NewHandler(repo))
+	mux.Handle("/ingest", ingest.RequireAPIKey(ingest.NewHandler(repo), apiKey))
 
 	go refreshFlakinessLoop(ctx, repo)
 
