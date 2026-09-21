@@ -99,3 +99,25 @@ func (r *Repository) RefreshFlakinessScores(ctx context.Context, repo string) er
 	}
 	return nil
 }
+
+func (r *Repository) DistinctRepos(ctx context.Context) ([]string, error) {
+	const query = `SELECT DISTINCT repo FROM test_runs`
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("querying distinct repos: %w", err)
+	}
+	defer rows.Close()
+
+	var repos []string
+	for rows.Next() {
+		var repo string
+		if err := rows.Scan(&repo); err != nil {
+			return nil, fmt.Errorf("scanning repo: %w", err)
+		}
+		repos = append(repos, repo)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterating repos: %w", err)
+	}
+	return repos, nil
+}
