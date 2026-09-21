@@ -1,0 +1,38 @@
+name: Example Usage
+
+on:
+  workflow_dispatch:
+  # In a real project with _test.go files, trigger this on every push instead:
+  # push:
+  #   branches: [main]
+
+jobs:
+  test-and-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        run: go test -json ./... > test-output.json
+
+      - name: Set up Python
+        if: success() || failure()
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Convert test output to FlakeGuard report
+        if: success() || failure()
+        run: python3 scripts/convert_go_test_json.py test-output.json > report.json
+
+      - name: Send report to FlakeGuard
+        if: success() || failure()
+        run: |
+          curl -sf -X POST "${{ secrets.FLAKEGUARD_INGEST_URL }}/ingest" \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: ${{ secrets.FLAKEGUARD_API_KEY }}" \
+            -d @report.json
