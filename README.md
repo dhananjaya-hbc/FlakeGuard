@@ -17,6 +17,7 @@ Flaky test detection for CI pipelines, exposed to AI coding assistants over MCP 
 - [Environment variables](#environment-variables)
 - [Project structure](#project-structure)
 - [Language support](#language-support)
+- [License](#license)
 
 ## The problem
 
@@ -52,7 +53,7 @@ Data enters on the left from CI and leaves on the right into an AI assistant. Th
 
 ## Prerequisites
 
-- **Go 1.27 or newer** — matches the `go` directive in [`go.mod`](go.mod). Check with `go version`.
+- **Go 1.25 or newer** — matches the `go` directive in [`go.mod`](go.mod), which is set by pgx/v5's own minimum. Check with `go version`.
 - **PostgreSQL** — either via Docker Compose (nothing to install), or a local instance for native development.
 - **Docker + Docker Compose** — only needed for the [Quick start](#quick-start-docker-compose) path.
 - **Python 3** — only needed to run `scripts/convert_go_test_json.py` (stdlib only, no `pip install` required).
@@ -277,3 +278,7 @@ Two files intentionally aren't committed, since they're machine-specific: `.env`
 Only one piece of this project is Go-specific: `scripts/convert_go_test_json.py`, which parses the particular JSON shape `go test -json` emits. Everything downstream — the `/ingest` API, the Postgres schema, the flakiness scoring, the MCP tools — works on plain `{test_name, status, ran_at}` data and has no idea what language produced it.
 
 To use FlakeGuard with another ecosystem, write a different converter that emits the same [ingestion report shape](#ingestion-api-reference) — for example, from `pytest --json-report`, Jest's `--json` output, or generic JUnit XML (which many test runners across languages can produce). Nothing else in the system needs to change.
+
+## License
+
+[MIT](LICENSE) © Dhananjaya Chamod
