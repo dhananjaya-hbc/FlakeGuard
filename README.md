@@ -24,19 +24,12 @@ Tests that fail intermittently — not because of a real bug, but timing issues,
 
 ## How it works
 
-```mermaid
-flowchart LR
-    A[Developer pushes code] --> B[GitHub Actions\nruns the test suite]
-    B --> C[go test -json output]
-    C --> D[convert_go_test_json.py]
-    D --> E[POST /ingest]
-    E --> F[(Postgres\ntest_runs)]
-    F --> G[Background ticker\nrecomputes flakiness_score]
-    G --> H[(Postgres\ntest_flakiness)]
-    H --> I[MCP server]
-    I --> J[AI coding assistant]
-    J --> K[Developer gets a\ngrounded answer]
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture-dark.svg">
+  <img alt="FlakeGuard architecture: a GitHub Actions runner converts go test JSON and POSTs it to the flakeguard http process, which writes through the repository layer into Postgres. A background ticker recomputes flakiness scores. Separately, an AI assistant spawns the flakeguard mcp process over stdio, which reads through the same repository layer." src="docs/architecture-light.svg">
+</picture>
+
+Data enters on the left from CI and leaves on the right into an AI assistant. The two halves run as **separate processes that never talk to each other** — they share only the `repository` package and the tables underneath it.
 
 1. A developer pushes code, and GitHub Actions runs the test suite.
 2. A CI step converts `go test -json` output into a small JSON report and POSTs it to FlakeGuard's `/ingest` endpoint.
