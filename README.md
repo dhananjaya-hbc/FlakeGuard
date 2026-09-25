@@ -10,6 +10,7 @@ Flaky test detection for CI pipelines, exposed to AI coding assistants over MCP 
 - [Prerequisites](#prerequisites)
 - [Quick start (Docker Compose)](#quick-start-docker-compose)
 - [Local development (without Docker)](#local-development-without-docker)
+- [Running the tests](#running-the-tests)
 - [Connecting to Claude Code](#connecting-to-claude-code)
 - [Worked example](#worked-example)
 - [Ingestion API reference](#ingestion-api-reference)
@@ -116,6 +117,24 @@ set -a; source .env; set +a
 ```
 
 In `mcp` mode, the binary speaks newline-delimited JSON-RPC 2.0 over stdin/stdout — it's meant to be launched as a subprocess by an MCP client (see below), not used interactively, though you can feed it raw JSON-RPC lines for manual testing.
+
+## Running the tests
+
+The flakiness scoring is the one part of the system whose failure mode is silent — a wrong query returns a plausible number rather than an error — so it is covered by tests that run against a real PostgreSQL instance rather than a mock.
+
+Create a scratch database, apply the schema, and point `TEST_DATABASE_URL` at it:
+
+```bash
+createdb flakeguard_test
+psql -d flakeguard_test -f migrations/001_init.sql
+
+TEST_DATABASE_URL=postgres://<user>@localhost:5432/flakeguard_test?sslmode=disable \
+  go test ./...
+```
+
+The tests **skip** when `TEST_DATABASE_URL` is unset, and deliberately never fall back to `DATABASE_URL` — they insert and delete rows, and must not run against a database holding real data. Each case writes under its own unique `repo` identifier and removes only its own rows, so they are safe to run against a shared development database and do not truncate shared tables.
+
+Coverage focuses on the `LAG()` flip detection: alternating results, always-passing, always-failing (which must score `0.0` — broken is not flaky), single-run divide-by-zero, cross-branch partitioning, skipped-status transitions, repo isolation, and upsert-on-repeat.
 
 ## Connecting to Claude Code
 
